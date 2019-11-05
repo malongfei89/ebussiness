@@ -1,9 +1,10 @@
 const app = require('express')()
 const bodyparser = require('body-parser')
 const cors = require('cors')
-require('dotenv').config()
-app.listen(process.env.PORT, ()=>{
-    console.log(`listen at ${process.env.PORT}`)
+const handleHttprequest = require('./controller/HandleHttprequest')
+app.listen(3000, ()=>{
+    console.log(`listen at 3000`)
 })
-app.use(bodyparser)
-app.use(cors)
+app.use(cors())
+app.use(bodyparser.json())
+app.use('/', handleHttprequest)

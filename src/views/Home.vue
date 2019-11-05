@@ -15,14 +15,14 @@
       <div style="top:15%;left:15%;width:70%;height:80%;position:absolute">
         <div class="input-group login-input-group">
           <label for="username">Username:</label>
-          <input id="username" type="text">
+          <input id="username" v-model="username" type="text">
         </div>
         <div class="input-group login-input-group">
           <label for="password">Password:</label>
-          <input id="password" type="password">
+          <input id="password" v-model="password" type="password">
         </div>
         <div class="div-button" style="height:15%;">
-          <button style="float:right;height:85%;width:65px;min-width:65px;">Login</button>
+          <button style="float:right;height:85%;width:65px;min-width:65px;" @click="login">Login</button>
         </div>
         <p style="width:100%;height:15%;float:right">No account yet? click <router-link class="noback" to="/register">here</router-link> to Register</p>
       </div>
@@ -39,8 +39,28 @@
 </template>
 
 <script>
+import { Globals } from '@/services/Api'
+import Authentication from '@/services/Authentication'
 export default {
+  data: () => {
+    return {
+      username: null,
+      password: null
+    }
+  },
   methods: {
+    async login () {
+      try {
+        const answer = await (Authentication.login({
+          username: this.username,
+          password: this.password
+        }))
+        Globals.user = answer.data //id, name
+      } catch (error) {
+        alert(error.response.data.error)
+        Globals.error = error.response.data.error
+      }
+    },
     generalQuestion () {
       alert('I know you have a question!')
     },
