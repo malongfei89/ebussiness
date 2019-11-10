@@ -1,6 +1,6 @@
-import Api from './Api.js'
+import { api } from './Api.js'
 export default {
     getProducts () {
-        return Api.get('/products')
+        return api().get('/products')
     }
 }

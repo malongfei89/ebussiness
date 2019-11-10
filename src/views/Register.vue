@@ -1,43 +1,41 @@
 <template>
   <div>
     <Header></Header>
-    <div style="width:70%;margin-top:40px;left:15%;position:relative">
-      <div class="input-group register-input-group">
-        <label for="newUsername">Username:</label>
+    <div class="form-div" style="min-width:340px">
+      <div class="input-group">
+        <label for="newUsername">Username:(required)</label>
         <input id="newUsername" v-model="newUsername" type="text">
       </div>
-      <div class="input-group register-input-group">
-        <label for="newPassword">Password:</label>
+      <div class="input-group ">
+        <label for="newPassword">Password:(required)</label>
         <input id="newPassword" v-model="newPassword" type="password">
       </div>
-      <div class="input-group register-input-group">
-        <label for="confirmNewPassword">Confirm Password:</label>
+      <div class="input-group ">
+        <label for="confirmNewPassword">Confirm Password:(required)</label>
         <input id="confirmNewPassword" v-model="confirmNewPassword" type="password">
       </div>
       <div class="input-group">
         <label style="font-size:20px;width:20%">I'm</label>
         <input type="radio" name="identity" v-model="identity" value="individual" checked><span style="font-size:18px"> An individual person</span>
-        <input type="radio" name="identity" v-model="identity" value="company"><span style="font-size:18px"> A company</span>
+        <input type="radio" name="identity" v-model="identity" value="company"><span style="font-size:18px"> A company (required)</span>
       </div>
-      <div class="input-group register-input-group">
+      <div class="input-group ">
         <label for="newName">Name:(optional)</label>
         <input id="newName" v-model="newName" type="text">
       </div>
-      <div class="input-group register-input-group">
+      <div class="input-group ">
         <label for="newAddress">Address:(optional)</label>
         <input id="newAddress" v-model="newAddress" type="text">
       </div>
-      <div class="input-group register-input-group">
+      <div class="input-group ">
         <label for="newBankName">Bank name:(optional)</label>
         <input id="newBankName" v-model="newBankName" type="text">
       </div>
-      <div class="input-group register-input-group">
+      <div class="input-group ">
         <label for="newBankAccount">Bank account:(optional)</label>
         <input id="newBankAccount" v-model="newBankAccount" type="text">
       </div>
-      <div class="div-button">
-        <button style="float:right;width:80px;padding:15px;margin:5px;text-align:center" @click="register">Register</button>
-      </div>
+      <button style="float:right;padding:20px;margin:0 20px 0 20px;" @click="register">Register</button>
     </div>
     <Footer></Footer>
   </div>
@@ -61,6 +59,14 @@ export default {
   },
   methods: {
     async register () {
+      if(!this.newUsername | !this.newPassword | !this.confirmNewPassword | !this.identity) {
+        Globals.toastr.push({ type: 'error', message: 'Please fill in all required fileds!'})
+        return
+      }
+      if (this.newPassword !== this.confirmNewPassword) {
+        Globals.toastr.push({ type: 'error', message: 'Two passwords you entered are not the same!'})
+        return
+      }
       try {
         await Authentication.register({
           name: this.newName,
@@ -68,11 +74,13 @@ export default {
           password: this.newPassword,
           address: this.newAddress,
           bank_name: this.newBankName,
-          card_number: this.newBankAccount
+          card_number: this.newBankAccount,
+          cus_type: this.identity
         })
+        this.$router.push('/')
+        Globals.toastr.push({ type: 'success', message: `You've been successfully registered!`})
       } catch (error) {
-        console.log(error.response.data)
-        Globals.error = error.response.data
+        Globals.toastr.push({ type: 'error', message: error.response.data.error})
       }
     }
   }

@@ -2,10 +2,12 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Home from '@/views/Home.vue'
 import Products from '@/views/Products.vue'
+import { Globals } from '@/services/Api'
 import Register from '@/views/Register.vue'
+import CheckOut from '@/views/CheckOut.vue'
 Vue.use(Router)
 
-export default new Router({
+const router = new Router({
   routes: [
     {
       path: '/',
@@ -21,6 +23,44 @@ export default new Router({
       path: '/register',
       name: 'Register',
       component: Register
+    },
+    {
+      path: '/checkout',
+      name: 'CheckOut',
+      component: CheckOut
     }
   ]
 })
+router.beforeEach((to, from, next) => {
+  if(to.name === 'CheckOut') {
+    if(Globals.user.length === 0 && !sessionStorage.getItem('user')) {
+      if(from.fullPath !== '/') {
+        next('/')
+        Globals.toastr.push({
+          type: 'error',
+          message: 'Please log in first!'
+        })
+        return
+      }
+      Globals.toastr.push({
+        type: 'error',
+        message: 'Please log in first!'
+      })
+      return
+    }
+    else if(Globals.cart.length === 0 && !sessionStorage.getItem('cart')) {
+      if(from.fullPath !== '/products') next('/products')
+      Globals.toastr.push({
+        type: 'error',
+        message: 'Please fullfil your order before checking out!'
+      })
+      return
+    }
+    next()
+  }
+  while(Globals.toastr.length > 0) {
+    Globals.toastr.pop()
+  }
+  next()
+})
+export default router
