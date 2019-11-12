@@ -20,19 +20,17 @@
                 <button @click="$router.push('/checkout')" class="cart-btn">Check<br> Out</button>
             </div>
         </ul>
-        <div class="product-div">
-            <ul>
-                <li v-for="(item, index) in products" :key="item.id"  class="item-div">
-                    <div style="padding-top:16px">{{item.name}}</div>
-                    <br>
-                    <div>$ {{item.unit_price}}</div>
-                    <br>
-                    <div>{{itemStockInfo(item, index)}}</div>
-                    <br>
-                    <button @click.stop="addToCart(item)" :style="styleforBtn(item)">Add</button>
-                </li>
-            </ul>
-        </div>
+        <ul class="product-div">
+            <li v-for="(item, index) in products" :key="item.id"  class="item-div">
+                <div style="padding-top:16px">{{item.name}}</div>
+                <br>
+                <div>$ {{item.unit_price}}</div>
+                <br>
+                <div>{{itemStockInfo(item, index)}}</div>
+                <br>
+                <button @click.stop="addToCart(item)" :style="styleforBtn(item)">Add</button>
+            </li>
+        </ul>
         <div class="loginPopup">
             <button @click="closeLoginPopup" style="float:right;width:40px;height:40px;background-color:transparent;font-size:30px">&times;</button>
             <div style="top:15%;left:15%;width:70%;height:80%;position:absolute">

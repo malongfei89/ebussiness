@@ -7,7 +7,7 @@
       <button @click.stop="$emit('toggleCart')" title="Shopping-cart" class="btn-right-header"><i class="fas fa-shopping-cart fa-5x"></i></button>
     </li>
     <li>
-      <button title="Question" class="btn-right-header" @click="generalQuestion"><i class="fas fa-question-circle fa-5x"></i></button>
+      <button title="Question" class="btn-right-header general-question" @click="generalQuestion"><i class="fas fa-question-circle fa-5x"></i></button>
     </li>
     <li class="header-list-item">
         <slot name="customized1"></slot>
