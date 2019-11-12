@@ -23,11 +23,8 @@
         <ul class="product-div">
             <li v-for="(item, index) in products" :key="item.id"  class="item-div">
                 <div style="padding-top:16px">{{item.name}}</div>
-                <br>
                 <div>$ {{item.unit_price}}</div>
-                <br>
                 <div>{{itemStockInfo(item, index)}}</div>
-                <br>
                 <button @click.stop="addToCart(item)" :style="styleforBtn(item)">Add</button>
             </li>
         </ul>
