@@ -142,8 +142,15 @@ input[type=number]::-webkit-inner-spin-button {
     border:2px solid grey;
   }
   .note-B2B{
-    font-size:15px;
+    font-size:20px;
     padding:20px;
+    left:25%;
+    width:50%;
+    position: relative;
+  }
+  .note-B2B>p{
+    text-align: left;
+    margin-top:5px;
   }
   .product-div {
     display: inline-block;

@@ -18,7 +18,7 @@
       </div>
       <div style="display:flex;justify-content:space-around;margin:20px">
         <button @click="$router.push('/products')" class="cart-btn">Continue<br>shopping</button>
-        <button @click="$router.push('/checkout')" class="cart-btn">Check<br> Out</button>
+        <button v-if="cart.length" @click="$router.push('/checkout')" class="cart-btn">Check<br> Out</button>
       </div>
     </ul>
     <div id="home-main">

@@ -48,14 +48,6 @@ router.beforeEach((to, from, next) => {
       })
       return
     }
-    else if(Globals.cart.length === 0 && !sessionStorage.getItem('cart')) {
-      if(from.fullPath !== '/products') next('/products')
-      Globals.toastr.push({
-        type: 'error',
-        message: 'Please fullfil your order before checking out!'
-      })
-      return
-    }
     next()
   }
   while(Globals.toastr.length > 0) {

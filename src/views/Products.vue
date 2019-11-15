@@ -17,7 +17,7 @@
             </div>
             <div style="display:flex;justify-content:space-around;margin:20px 0">
                 <button @click="toggleCart2" class="cart-btn">Continue<br>shopping</button>
-                <button @click="$router.push('/checkout')" class="cart-btn">Check<br> Out</button>
+                <button v-if="cart.length" @click="$router.push('/checkout')" class="cart-btn">Check<br> Out</button>
             </div>
         </ul>
         <ul class="product-div">
@@ -40,7 +40,7 @@
                 <input id="password" v-model="password" type="password">
             </div>
             <div class="div-button" style="height:15%;">
-            <button style="float:right;height:85%;width:65px;min-width:65px;" @click="login">Login</button>
+            <button style="float:right;width:65px;min-width:65px;padding:12px;margin-right:18px" @click="login">Login</button>
             </div>
                 <p style="width:100%;height:15%;float:right">No account yet? click <router-link class="noback" to="/register">here</router-link> to Register</p>
             </div>
