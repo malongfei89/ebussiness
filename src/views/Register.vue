@@ -1,7 +1,7 @@
 <template>
   <div>
     <Header></Header>
-    <div class="form-div" style="min-width:340px">
+    <div v-if="showNote" class="form-div" style="min-width:340px">
       <div class="input-group">
         <label for="newUsername">Username:(required)</label>
         <input id="newUsername" v-model="newUsername" type="text">
@@ -37,6 +37,20 @@
       </div>
       <button style="float:right;padding:20px;margin:0 20px 0 20px;" @click="register">Register</button>
     </div>
+    <div v-else class="note-B2B">
+      <pre style="display: block;">Here is the information for making B2B order:
+  <b>Port</b>: 11089
+  <b>Data</b> you need to send in along: 
+  <b>username</b> your username,
+  <b>password</b>: password for your username,
+  <b>products</b>: product name(1.case-insensitive.
+                           ex. If you choose 'Next-day Deliver', 
+                           'next-day deliver' will work
+                         2.if you select more than one product, 
+                           please put all your products in an array
+                           ex ['Next-day Deliver', 'Regular Shipping'])
+  <b>quantity</b>: (if you have selected more than one products,)</pre>
+    </div>
     <Footer></Footer>
   </div>
 </template>
@@ -54,7 +68,8 @@ export default {
       newName: null,
       newAddress: null,
       newBankName: null,
-      newBankAccount: null
+      newBankAccount: null,
+      showNote: false
     }
   },
   methods: {
@@ -77,8 +92,13 @@ export default {
           card_number: this.newBankAccount,
           cus_type: this.identity
         })
-        this.$router.push('/')
-        Globals.toastr.push({ type: 'success', message: `You've been successfully registered!`})
+        if(this.identity==='company'){
+          this.showNote=true
+        }
+        else{
+          this.$router.push('/')
+          Globals.toastr.push({ type: 'success', message: `You've been successfully registered!`})
+        }
       } catch (error) {
         Globals.toastr.push({ type: 'error', message: error.response.data.error})
       }

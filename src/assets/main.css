@@ -141,6 +141,10 @@ input[type=number]::-webkit-inner-spin-button {
     position:relative;
     border:2px solid grey;
   }
+  .note-B2B{
+    font-size:15px;
+    padding:20px;
+  }
   .product-div {
     display: inline-block;
     padding-bottom:30px;
