@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <div style="position:absolute;z-index:2;right:45%;max-width:280px;text-align:center">
+    <div style="position:absolute;z-index:2;right:18%;width:64%;text-align:center;top:14%">
        <div :id="`toast-${index}`" v-for="(toast, index) in newToast" :key="index" @click="resetToastr(index)" @animationend="resetToastr(index)" :style="{backgroundColor:toast.type==='error'?error:success}" class="toastr-block">
         {{toast.message}}
       </div>

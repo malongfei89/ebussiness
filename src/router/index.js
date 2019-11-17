@@ -8,6 +8,7 @@ import CheckOut from '@/views/CheckOut.vue'
 Vue.use(Router)
 
 const router = new Router({
+  mode: 'history',
   routes: [
     {
       path: '/',
@@ -33,15 +34,7 @@ const router = new Router({
 })
 router.beforeEach((to, from, next) => {
   if(to.name === 'CheckOut') {
-    if(Globals.user.length === 0 && !sessionStorage.getItem('user')) {
-      if(from.fullPath !== '/') {
-        next('/')
-        Globals.toastr.push({
-          type: 'error',
-          message: 'Please log in first!'
-        })
-        return
-      }
+    if(!Globals.user.length && !sessionStorage.getItem('user')) {
       Globals.toastr.push({
         type: 'error',
         message: 'Please log in first!'
