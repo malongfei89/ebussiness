@@ -8,7 +8,7 @@ import CheckOut from '@/views/CheckOut.vue'
 Vue.use(Router)
 
 const router = new Router({
-  mode: 'history',
+  base: '/e/b-f19-08/',
   routes: [
     {
       path: '/',

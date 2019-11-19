@@ -50,6 +50,7 @@
     </div>
 </template>
 <script>
+import { throttlingComponents } from '@/services/ThrottlingComponents'
 import { Globals } from '@/services/Api'
 import Authentication from '@/services/Authentication'
 import GetProducts from '@/services/GetProducts'
@@ -76,6 +77,7 @@ export default {
         if(this.cart.length === 0 && sessionStorage.getItem('cart')) {
             this.cart = JSON.parse(sessionStorage.getItem('cart'))
         }
+        this.addToCart = throttlingComponents(500, this.addToCart)
     },
     methods: {
         loginOrOut () {
