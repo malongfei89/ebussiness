@@ -35,6 +35,7 @@ const router = new Router({
 router.beforeEach((to, from, next) => {
   if(to.name === 'CheckOut') {
     if(!Globals.user.length && !sessionStorage.getItem('user')) {
+      next('/')
       Globals.toastr.push({
         type: 'error',
         message: 'Please log in first!'

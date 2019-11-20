@@ -27,10 +27,11 @@ import { Globals } from '@/services/Api'
 export default {
   methods: {
     generalQuestion () {
-      Globals.toastr.push({
-        type:'success',
-        message:`You've been successfully registered!`
-      })
+      if(!Globals.user.length) alert('This contains information about B2B order, login if you want to see it')
+      else {
+        if(Globals.user[0].cus_type === 'company') this.$emit('showNote')
+        else alert('Only a B2B custome can view this information.')
+      }
     }
   }
 }

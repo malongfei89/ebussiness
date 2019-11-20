@@ -2,7 +2,7 @@
   <div @click="toggleCart2">
     <Header @toggleCart="toggleCart">
       <template #customized1>
-      <button style="font-weight:bold;padding:46px 0;width:100%;min-width:94px" @click="showlogin">{{btnD}}</button>
+      <button style="font-weight:bold;padding:46px 0;width:100%;min-width:94px" @click="showLogin">{{btnD}}</button>
     </template>
     </Header>
     <ul v-if="showCart" @click.stop class="cart-ul">
@@ -71,6 +71,7 @@
       <button style="float:right;padding:20px;margin:0 20px 0 20px;" @click="register">Register</button>
     </div>
     <div v-else class="note-B2B">
+      <button style="font-size:20px;padding:10px" @click="$router.push('/')">Got it</button>
       <p>Here is the information for making B2B order:</p>
       <p><b>Port</b>: 11089</p>
       <p><b>Data</b> you need to send in along: </p>
@@ -215,7 +216,7 @@ export default {
         }))
         Globals.user.push(answer.data) //id, name
         this.btnD = 'Log out'
-        this.closeLoginPopup () 
+        this.$router.push('/')
         Globals.toastr.push({
           type: 'success',
           message: `Log in successfully!`
@@ -224,9 +225,9 @@ export default {
         Globals.toastr.push({ type: 'error', message: error.response.data.error})
       }
     },
-    showlogin () {
-      document.getElementsByClassName('loginPopup')[0].style.display = 'block'
-      document.getElementById('overlay').classList.add('greyout')
+    showLogin () {
+        document.getElementsByClassName('loginPopup')[0].style.display = 'block'
+        document.getElementById('overlay').classList.add('greyout')
     },
     closeLoginPopup () {
       document.getElementById('overlay').classList.remove('greyout')

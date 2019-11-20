@@ -1,6 +1,10 @@
 <template>
   <div @click="toggleCart2">
-    <Header @toggleCart="toggleCart"></Header>
+    <Header @toggleCart="toggleCart" @showNote="showNote = true">
+      <template #customized1>
+            <button style="font-weight:bold;width:100%;padding:46px 0;min-width:94px" @click="logOut">{{btnD}}</button>
+      </template>
+    </Header>
     <ul v-if="showCart" @click.stop class="cart-ul">
       <div v-if="cart.length">
         <li class="cart-li" v-for="(item, index) in cart" :key="index">
@@ -11,21 +15,21 @@
       <div style="margin:50px;padding:20px 5px;font-size:24px;text-align:center" v-else>
         Nothing has been added to your cart yet!
       </div>
-      <div style="display:flex;justify-content:flex-start;margin:20px">
+      <div style="display:flex;justify-content:center;margin:20px">
         <button @click="$router.push('/products')" class="cart-btn">Continue<br>shopping</button>
       </div>
     </ul>
-    <div style="display:flex;justify-content:center;">
+    <div style="display:flex;justify-content:center;flex-wrap:wrap" v-if="!showNote">
       <ul class="checkout-div">
         <li class="cart-li" v-for="(itemInCart, indexForItemInCart) in cart" :key="indexForItemInCart">
-        {{itemInCart.name}}<span style="float:right;display:flex;">Quantity: <input @focusout="updateCart(itemInCart, indexForItemInCart)" style="width:25px;margin-left:3px;padding:2px" type="number" v-model.number="itemInCart.quantity"></span><br>
+        {{itemInCart.name}}<span style="float:right;">Quantity: <input @focusout="updateCart(itemInCart, indexForItemInCart)" style="width:25px;margin-left:3px;padding:2px" type="number" v-model.number="itemInCart.quantity"></span><br>
         <span style="clear:right;float:right">Price: {{(itemInCart.quantity * itemInCart.unit_price).toFixed(2)}}</span>
         </li>
-        <li style="margin:20px 10px 10px 0px;clear:right;float:right;font-size:24px;text-align:right">Total Before Tax: {{totalCost}}</li>
+        <li style="margin:20px 10px 10px 0px;clear:right;float:right;font-size:24px;text-align:right">Total Before Tax: {{totalCost.toFixed(2)}}</li>
         <br>
-        <li style="margin:10px 10px 10px 0px;clear:right;float:right;font-size:24px;">Estimate Tax: {{calTax}}</li>
+        <li style="margin:10px 10px 10px 0px;clear:right;float:right;font-size:24px;">Estimate Tax: {{calTax.toFixed(2)}}</li>
         <br>
-        <li style="margin:10px 10px 10px 0px;clear:right;float:right;font-size:24px;">Grand Total: {{(parseFloat(totalCost) + parseFloat(calTax)).toFixed(2)}}</li>
+        <li style="margin:10px 10px 10px 0px;clear:right;float:right;font-size:24px;">Grand Total: {{(totalCost + calTax).toFixed(2)}}</li>
       </ul>
     <div class="checkout-form">
       <div style="padding: 0 10px">
@@ -71,6 +75,79 @@
       </div>
     </div>
     </div>
+    <div v-else class="note-B2B">
+      <button style="font-size:20px;padding:10px" @click="showNote=false">Got it</button>
+      <p>Here is the information for making B2B order:</p>
+      <p><b>Port</b>: 11089</p>
+      <p><b>Data</b> you need to send in along: </p>
+      <p><b>Username</b>: your username,</p>
+      <p><b>Password</b>: password for your username,</p>
+      <p><b>Order Details</b>:</p>
+      <p> 1.Case-insensitive.</p>
+      <p style="margin-left:10px;">
+        ex. If you choose 'Next-day Deliver', 'next-day deliver' will work
+      </p>
+      <p>
+        2.Please put name of product and quantity you will order in JSON object
+      </p>
+      <p style="margin-left:10px;">
+        ex. {name: 'Next-day Deliver', quantity: 1}
+      </p>
+      <p>
+        3.If you select more than one product, please put all your products in an array
+      </p>
+      <p style="margin-left:10px;">
+        ex. [{name: 'Next-day Deliver', quantity: 2}, 
+      </p>
+      <p style="margin-left:35px;">
+      {name: 'Regular Shipping', quantity: 1}]
+      </p>
+      <p><b>Bank Information</b>:</p>
+      <p>
+        Please put name of bank and account number in JSON object
+      </p>
+      <p style="margin-left:10px;">
+        ex. {bankName: 'bank of america', 
+      </p>
+      <p style="margin-left:45px;">
+      bankAccount: 12345678914}
+      </p>
+      <p><b>Recipient Information</b>:</p>
+      <p>
+        Please put name and address of recipient in JSON object
+      </p>
+      <p style="margin-left:10px;">
+        ex. {shipToName: 'Lyn', 
+      </p>
+      <p style="margin-left:45px;">
+      shipToAddress: '0 main st new paltz NY 12561'}
+      </p>
+      <p><b>Complete Example:(please use the same key names)</b>:</p>
+      <p>{</p>
+      <p>username: 123,</p>
+      <p>password: 123,</p>
+      <p>orderDetail: </p>
+      <p style="margin-left:10px;">
+        [{name: 'Next-day Deliver', quantity: 2}, 
+      </p>
+      <p style="margin-left:11px;">
+      {name: 'Regular Shipping', quantity: 1}],
+      </p>
+      <p>bankInfo: </p>
+       <p style="margin-left:10px;">
+        {bankName: 'bank of america', 
+      </p>
+      <p style="margin-left:16px;">
+      bankAccount: 12345678914},</p>
+      <p>shippingInfo: </p>
+      <p style="margin-left:10px;">
+        {shipToName: 'Lyn', 
+      </p>
+      <p style="margin-left:15px;">
+      shipToAddress: '0 main st new paltz NY 12561'}
+      </p>
+      <p>}</p>
+      </div>
     <Footer></Footer>
   </div>
 </template>
@@ -87,15 +164,15 @@ export default {
       user: Globals.user,
       cart: Globals.cart,
       bankInfo: [],
-      bankAccount: null,
-      bankName: null,
       selectedBankInfo: {
         bankName: null,
         bankAccount: null
       },
       shipToName: null,
       shipToAddress: null,
-      showCart: false
+      showCart: false,
+      btnD: 'Log out',
+      showNote: false
     }
   },
   async created () {
@@ -115,10 +192,10 @@ export default {
       for(let cartItem of this.cart){
         total+=cartItem.unit_price*cartItem.quantity
       }
-      return total.toFixed(2)
+      return total
     },
     calTax () {
-      return (this.totalCost * TAX_RATE).toFixed(2)
+      return (this.totalCost * TAX_RATE)
     }
   },
   methods: {
@@ -131,20 +208,24 @@ export default {
         Globals.toastr.push({ type: 'error', message: 'Please fill in all fields!'})
         return
       }
-      if(confirm(`You will be changred for ${(parseFloat(this.totalCost) + parseFloat(this.calTax)).toFixed(2)} dollars.`)){
-        try {
-          await Authentication.checkout({
-            id: this.user[0].id,
-            shipToName: this.shipToName,
-            shipToAddress: this.shipToAddress,
-            bankInfo: this.selectedBankInfo,
-            orderDetail: this.cart,
-            totalCostbfTax: this.totalCost,
-            tax: this.calTax
-          })
-        } catch (error) {
-          Globals.toastr.push({ type: 'error', message: error.response.data.error})
+      if(this.totalCost>0){
+        if(confirm(`You will be changred for ${(this.totalCost + this.calTax).toFixed(2)} dollars.`)){
+          try {
+            await Authentication.checkout({
+              id: this.user[0].id,
+              shipToName: this.shipToName,
+              shipToAddress: this.shipToAddress,
+              bankInfo: this.selectedBankInfo,
+              orderDetail: this.cart,
+              totalCostbfTax: this.totalCost,
+              tax: this.calTax
+            })
+          } catch (error) {
+            Globals.toastr.push({ type: 'error', message: error.response.data.error})
+          }
         }
+      } else {
+        Globals.toastr.push({ type: 'error', message: 'Your cart is empty!' })
       }
     },
     toggleCart () {
@@ -155,6 +236,18 @@ export default {
     },
     addNewBankInfo () {
       alert('coming soon!')
+    },
+    logOut () {
+      if(confirm('Your order will be lost. Are you sure?')){
+        this.user.pop()
+        this.cart = []
+        Globals.cart = []
+        Globals.user = []
+        if(sessionStorage.getItem('cart')) sessionStorage.removeItem('cart')
+        if(sessionStorage.getItem('user')) sessionStorage.removeItem('user')
+        this.btnD = 'Register/Login'
+        this.$router.push('/')
+      }
     }
   }
 }
