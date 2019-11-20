@@ -286,6 +286,9 @@ export default {
             this.products.reverse()
         },
         itemInRange (low, high) {
+            this.lowPrice = null
+            this.highPrice = null
+            this.resetProducts()
             this.products = this.products.filter(item => {
                 return item.unit_price > low && item.unit_price < high
             })

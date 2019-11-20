@@ -19,6 +19,21 @@
         <button @click="$router.push('/products')" class="cart-btn">Continue<br>shopping</button>
       </div>
     </ul>
+    <div v-if="!orderSuccessful">
+    <div class="loginPopup">
+      <button @click="closeAddBankDiv" style="float:right;width:40px;height:40px;background-color:transparent;font-size:30px">&times;</button>
+      <div style="top:15%;left:15%;width:70%;height:80%;position:absolute">
+        <div class="input-group">
+          <label for="bankname">Bank Name:</label>
+          <input id="bankname" v-model="newBankName" type="text">
+        </div>
+        <div class="input-group login-input-group">
+          <label for="bankaccount">Bank Account:</label>
+          <input id="bankaccount" v-model="newBankAccount" type="text">
+        </div>
+          <button style="float:right;width:65px;min-width:65px;padding:12px;margin-right:18px" @click="addNewBankInfo">Add</button>
+      </div>
+    </div>
     <div style="display:flex;justify-content:center;flex-wrap:wrap" v-if="!showNote">
       <ul class="checkout-div">
         <li class="cart-li" v-for="(itemInCart, indexForItemInCart) in cart" :key="indexForItemInCart">
@@ -47,7 +62,7 @@
         <input style="font-size:20px" v-model="selectedBankInfo.bankName" type="text">
       </div>
       <div v-else class="input-group">
-         <button @click="addNewBankInfo" style="width:100%;backgroundColor:transparent;color:blue;margin-bottom:12px">Want to add a new bank account?</button>
+         <button @click="showAddBankDiv" style="width:100%;backgroundColor:transparent;color:blue;margin-bottom:12px">Want to add a new bank account?</button>
         <div style="width:100%">
           <div>
             <label  for="newBankName">Bank name:</label>
@@ -148,13 +163,18 @@
       </p>
       <p>}</p>
       </div>
+    <div id="overlay" @click="closeAddBankDiv"></div>
+    </div>
+    <div v-else>
+      <p style="font-size:40px;padding:20px;margin:10px">Thank you for your business!</p>
+      <p style="font-size:25px;padding:20px;margin:10px">You order has been placed!</p>
+      <p style="font-size:25px;padding:20px;margin:10px">Your confirmation number is {{confirmationID}}</p>
+    </div>
     <Footer></Footer>
   </div>
 </template>
 
 <script>
-//implement add new bank account
-//potentially add new bank account here into customer's account(db)
 const TAX_RATE = 0.0875
 import Authentication from '@/services/Authentication'
 import { Globals } from '@/services/Api'
@@ -172,7 +192,12 @@ export default {
       shipToAddress: null,
       showCart: false,
       btnD: 'Log out',
-      showNote: false
+      showNote: false,
+      hasNewBankInfo: true,
+      newBankName: null,
+      newBankAccount: null,
+      orderSuccessful: false,
+      confirmationID: null
     }
   },
   async created () {
@@ -211,15 +236,36 @@ export default {
       if(this.totalCost>0){
         if(confirm(`You will be changred for ${(this.totalCost + this.calTax).toFixed(2)} dollars.`)){
           try {
-            await Authentication.checkout({
-              id: this.user[0].id,
-              shipToName: this.shipToName,
-              shipToAddress: this.shipToAddress,
-              bankInfo: this.selectedBankInfo,
-              orderDetail: this.cart,
-              totalCostbfTax: this.totalCost,
-              tax: this.calTax
-            })
+            if(this.bankInfo.length === 0){
+              this.confirmationID = (await Authentication.checkout({
+                id: this.user[0].id,
+                shipToName: this.shipToName,
+                shipToAddress: this.shipToAddress,
+                bankInfo: this.selectedBankInfo,
+                orderDetail: this.cart,
+                totalCostbfTax: this.totalCost,
+                tax: this.calTax,
+                hasNewBankInfo: this.hasNewBankInfo
+              })).data.confirmationId
+              this.orderSuccessful = true
+              this.cart = Globals.cart = []
+              if(sessionStorage.getItem('cart')) sessionStorage.removeItem('cart')
+            } else {
+              this.confirmationID = (await Authentication.checkout({
+                id: this.user[0].id,
+                shipToName: this.shipToName,
+                shipToAddress: this.shipToAddress,
+                bankInfo: this.selectedBankInfo,
+                orderDetail: this.cart,
+                totalCostbfTax: this.totalCost,
+                tax: this.calTax,
+                hasNewBankInfo: !this.hasNewBankInfo
+              })).data.confirmationId
+              this.orderSuccessful = true
+              this.cart = Globals.cart = []
+              if(sessionStorage.getItem('cart')) sessionStorage.removeItem('cart')
+            }
+            
           } catch (error) {
             Globals.toastr.push({ type: 'error', message: error.response.data.error})
           }
@@ -234,8 +280,30 @@ export default {
     toggleCart2 () {
       if(this.showCart) this.showCart=false
     },
-    addNewBankInfo () {
-      alert('coming soon!')
+    async addNewBankInfo () {
+      try {
+        await Authentication.addNewBankInfo({
+          newBankName: this.newBankName,
+          newBankAccount: this.newBankAccount,
+          cus_id: this.user[0].id
+        })
+        Globals.toastr.push({ type: 'success', message: 'Bank account added successfully!'})
+        this.bankInfo.push({
+          bank_name: this.newBankName,
+          card_number: this.newBankAccount
+        })
+        this.closeAddBankDiv()
+      } catch (error) {
+        Globals.toastr.push({ type: 'error', message: error.response.data.error})
+      }
+    },
+    showAddBankDiv () {
+      document.getElementsByClassName('loginPopup')[0].style.display = 'block'
+      document.getElementById('overlay').classList.add('greyout')
+    },
+    closeAddBankDiv () {
+      document.getElementById('overlay').classList.remove('greyout')
+      document.getElementsByClassName('loginPopup')[0].style.display = 'none'
     },
     logOut () {
       if(confirm('Your order will be lost. Are you sure?')){

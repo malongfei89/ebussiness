@@ -12,5 +12,8 @@ export default {
     },
     checkout (credential) {
         return api().post('/checkout', credential)
+    },
+    addNewBankInfo (credential) {
+        return api().patch('/checkout', credential)
     }
 }
