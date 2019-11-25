@@ -1,11 +1,12 @@
 <template>
 <div @click="toggleCart2">
-  <Header @toggleCart='toggleCart' @showNote="showNote = true">
+  <Header @toggleCart='toggleCart' @showNote="showNote = !showNote">
     <template #customized1>
       <button style="font-weight:bold;padding:46px 0;width:100%;min-width:94px" @click="loginOrOut">{{btnD}}</button>
     </template>
   </Header>
   <main v-if="!showNote">
+    <transition name="cart">
     <ul v-if="showCart" @click.stop class="cart-ul">
       <div v-if="cart.length">
         <li class="cart-li" v-for="(item, index) in cart" :key="index">
@@ -21,105 +22,31 @@
         <button v-if="cart.length" @click="$router.push('/checkout')" class="cart-btn">Check<br> Out</button>
       </div>
     </ul>
+    </transition>
     <div id="home-main">
     <div style="margin:0;padding:0">
       <img style="width:66%;float:left" src="@/assets/home-page-pic.jpg" alt="fast shipping">
     </div>
-    <div class="loginPopup">
-      <button @click="closeLoginPopup" style="float:right;width:40px;height:40px;background-color:transparent;font-size:30px">&times;</button>
-      <div style="top:15%;left:15%;width:70%;height:80%;position:absolute">
-        <div class="input-group login-input-group">
-          <label for="username">Username:</label>
-          <input id="username" v-model="username" type="text">
-        </div>
-        <div class="input-group login-input-group">
-          <label for="password">Password:</label>
-          <input id="password" v-model="password" type="password">
-        </div>
-          <button style="float:right;width:65px;min-width:65px;padding:12px;margin-right:18px" @click="login">Login</button>
-        <p style="width:100%;height:15%;float:right">No account yet? click <router-link class="noback" to="/register">here</router-link> to Register</p>
-      </div>
-    </div>
+    <Popup
+    btnValue = "Login" 
+    type1 = "text"
+    type2 = "password"
+    label1 = "Username: "
+    label2 = "Password: "
+    :showPopup = "showLoginPopup"
+    forLabel1 = "username"
+    forLabel2 = "password"
+    @finished = "login($event)"
+    @closePopup = "showLoginPopup = false"
+    >
+    </Popup>
     <div id="home-description"><p>
       Here, We provide you with fast and Accurate shipping experience. Leave your package to us, and be worry free!
     </p>
     </div>
     </div>
   </main>
-  <div v-else class="note-B2B">
-      <button style="font-size:20px;padding:10px" @click="showNote=false">Got it</button>
-      <p>Here is the information for making B2B order:</p>
-      <p><b>Port</b>: 11089</p>
-      <p><b>Data</b> you need to send in along: </p>
-      <p><b>Username</b>: your username,</p>
-      <p><b>Password</b>: password for your username,</p>
-      <p><b>Order Details</b>:</p>
-      <p> 1.Case-insensitive.</p>
-      <p style="margin-left:10px;">
-        ex. If you choose 'Next-day Deliver', 'next-day deliver' will work
-      </p>
-      <p>
-        2.Please put name of product and quantity you will order in JSON object
-      </p>
-      <p style="margin-left:10px;">
-        ex. {name: 'Next-day Deliver', quantity: 1}
-      </p>
-      <p>
-        3.If you select more than one product, please put all your products in an array
-      </p>
-      <p style="margin-left:10px;">
-        ex. [{name: 'Next-day Deliver', quantity: 2}, 
-      </p>
-      <p style="margin-left:35px;">
-      {name: 'Regular Shipping', quantity: 1}]
-      </p>
-      <p><b>Bank Information</b>:</p>
-      <p>
-        Please put name of bank and account number in JSON object
-      </p>
-      <p style="margin-left:10px;">
-        ex. {bankName: 'bank of america', 
-      </p>
-      <p style="margin-left:45px;">
-      bankAccount: 12345678914}
-      </p>
-      <p><b>Recipient Information</b>:</p>
-      <p>
-        Please put name and address of recipient in JSON object
-      </p>
-      <p style="margin-left:10px;">
-        ex. {shipToName: 'Lyn', 
-      </p>
-      <p style="margin-left:45px;">
-      shipToAddress: '0 main st new paltz NY 12561'}
-      </p>
-      <p><b>Complete Example:(please use the same key names)</b>:</p>
-      <p>{</p>
-      <p>username: 123,</p>
-      <p>password: 123,</p>
-      <p>orderDetail: </p>
-      <p style="margin-left:10px;">
-        [{name: 'Next-day Deliver', quantity: 2}, 
-      </p>
-      <p style="margin-left:11px;">
-      {name: 'Regular Shipping', quantity: 1}],
-      </p>
-      <p>bankInfo: </p>
-       <p style="margin-left:10px;">
-        {bankName: 'bank of america', 
-      </p>
-      <p style="margin-left:16px;">
-      bankAccount: 12345678914},</p>
-      <p>shippingInfo: </p>
-      <p style="margin-left:10px;">
-        {shipToName: 'Lyn', 
-      </p>
-      <p style="margin-left:15px;">
-      shipToAddress: '0 main st new paltz NY 12561'}
-      </p>
-      <p>}</p>
-      </div>
-  <div id="overlay" @click="closeLoginPopup"></div>
+  <B2BDescription v-else @closeNote="showNote=false"></B2BDescription>
   <Footer></Footer>
 </div>
 </template>
@@ -130,34 +57,63 @@ import Authentication from '@/services/Authentication'
 export default {
   data: () => {
     return {
-      cart: Globals.cart,
-      username: null,
-      password: null,
+      cart: [],
       showCart: false,
-      user: Globals.user,
-      btnD: null,
-      showNote: false
+      user: [],
+      showNote: false,
+      showLoginPopup: false
     }
   },
-  mounted () {
-    if(this.user.length === 0 && sessionStorage.getItem('user')){
-      this.user = JSON.parse(sessionStorage.getItem('user'))[0]
+  created () {
+    if(Globals.cart.length || Globals.user.length) {
+      this.user = Globals.user
+      this.cart = Globals.cart
+    } else{
+      if(sessionStorage.getItem('user')) {
+          this.user = JSON.parse(sessionStorage.getItem('user'))
+      }
+      if(this.user.length){
+        if(localStorage.getItem(`cart${this.user[0].id}`)) {
+            this.cart = JSON.parse(localStorage.getItem(`cart${this.user[0].id}`))
+        }
+      } else{
+        if(localStorage.getItem(`cart`)) {
+            this.cart = JSON.parse(localStorage.getItem(`cart`))
+            localStorage.removeItem('cart')
+        }
+      }
+      Globals.user = this.user
+      Globals.cart = this.cart
     }
-    this.btnD = this.user.length?'Log out':'Register/Login'
-    if(this.cart.length === 0 && sessionStorage.getItem('cart')) {
-      this.cart = JSON.parse(sessionStorage.getItem('cart'))
+  }, 
+  computed: {
+    btnD: function () {
+      return this.user.length?'Log out':'Register/Login'
     }
   },
   methods: {
-    async login () {
+    async login (credential) {
       try {
         const answer = await (Authentication.login({
-          username: this.username,
-          password: this.password
+          username: credential.value1,
+          password: credential.value2
         }))
-        Globals.user.push(answer.data) //id, name
-        this.btnD = 'Log out'
-        this.closeLoginPopup () 
+        this.user.push(answer.data) //id, name
+        if(localStorage.getItem(`cart${this.user[0].id}`)) {
+          const result = JSON.parse(localStorage.getItem(`cart${this.user[0].id}`))
+          for(let i = 0;i<this.cart.length;i++) {
+            for(let j=0;j<result.length;j++) {
+              if(this.cart[i].id === result[j].id){
+                this.cart[i].quantity += result[j].quantity
+                result.splice(j, 1)
+                break
+              }
+            }
+          }
+          this.cart.push(...result)
+        }
+        sessionStorage.setItem(`user`, JSON.stringify(this.user))
+        this.showLoginPopup = false 
         Globals.toastr.push({
           type: 'success',
           message: `Log in successfully!`
@@ -166,30 +122,22 @@ export default {
         Globals.toastr.push({ type: 'error', message: error.response.data.error})
       }
     },
-    closeLoginPopup () {
-      document.getElementById('overlay').classList.remove('greyout')
-      document.getElementsByClassName('loginPopup')[0].style.display = 'none'
-    },
     loginOrOut () {
       if(this.btnD === 'Log out') {
+        localStorage.setItem(`cart${this.user[0].id}`, JSON.stringify(this.cart))
+        this.cart= Globals.cart = []
         this.user.pop()
-        this.cart = []
-        Globals.cart = []
-        Globals.user = []
-        if(sessionStorage.getItem('cart')) sessionStorage.removeItem('cart')
         if(sessionStorage.getItem('user')) sessionStorage.removeItem('user')
-        this.btnD = 'Register/Login'
       }
       else {
-          document.getElementsByClassName('loginPopup')[0].style.display = 'block'
-          document.getElementById('overlay').classList.add('greyout')
+        this.showLoginPopup = true
       }
     },
     toggleCart () {
       this.showCart = !this.showCart
     },
     toggleCart2 () {
-      if(this.showCart) this.showCart=false
+      if(this.showCart)  this.showCart=false
     },
     updateCart (item, index) {
       if(item.quantity < 0 ) item.quantity = 0

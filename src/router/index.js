@@ -9,6 +9,7 @@ Vue.use(Router)
 
 const router = new Router({
   base: '/e/b-f19-08/',
+  mode: 'hash',
   routes: [
     {
       path: '/',

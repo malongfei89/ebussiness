@@ -96,20 +96,20 @@ input[type=number]::-webkit-inner-spin-button {
     bottom:0;
     left:0;
     right:0;
+    z-index: 1;
     background-color: darkgray;
     opacity: 0.5;
   }
-  .loginPopup {
+  .popup {
     border-radius: 4px;
-    min-width: 360px;
-    min-height: 285px;
-    /* width:25%;
-    height:35%; */
-    z-index: 2;
-    top:30%;
-    left:37%;
     position: absolute;
-    display:none;
+    top:30%;
+    left:50%;
+    width:20%;
+    min-width: 300px;
+    height: 280px;
+    z-index: 2;
+    transform:translate(-50%, -30%);
     background-color: rgb(233, 230, 230)
   }
   #home-description{
@@ -134,11 +134,10 @@ input[type=number]::-webkit-inner-spin-button {
     padding: 8px 10px 7px 10px;
   }
   .form-div{
-    padding:40px 40px 60px 40px;
-    width:50%;
+    padding:30px 15px 60px 15px;
+    width:60%;
     margin-top:40px;
-    left:25%;
-    position:relative;
+    transform: translate(33.3%,0);
     border:2px solid grey;
   }
   .note-B2B{
@@ -164,18 +163,19 @@ input[type=number]::-webkit-inner-spin-button {
   .sidebar>ul>li>button{
     font-size:25px;
     background-color: transparent;
+    color: blueviolet
   }
   .sidebar>ul>li>button:hover{
-    color:blue;
+    text-decoration: underline;
+    color: rgb(177, 109, 109)
   }
-    .product-div {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-evenly;
-    /* padding-bottom:30px; */
-    width:70%;
-    padding: 10px 10px 20px 10px;
-    border:2px solid grey;
+  .product-div {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+  width:70%;
+  padding: 10px 10px 20px 10px;
+  border:2px solid grey;
   }
   .checkout-div {
     display: inline-block;
@@ -223,107 +223,50 @@ input[type=number]::-webkit-inner-spin-button {
     display:block;
 }
 .toastr-block{
-  left:25%;
-  position: relative;
   width:50%;
+  transform: translate(50%,0);
   margin-top:10px;
-  padding:20px 15px;
+  padding:15px;
   font-size:25px;
   animation: toastrDisappear 1s linear 2s;
 }
-.cartDisappear {
-  animation: cartDisappear 1.5s linear;
+.cart-enter-active {
+  animation: cartAppear .5s linear;
 }
-.cartAppear {
-  animation: cartAppear 1.5s linear;
+.cart-leave-active {
+  animation: cartAppear .5s linear reverse ;
 }
 @keyframes toastrDisappear {
   0% { opacity: 1; }
   50% { opacity: 0.5; }
   100% { opacity: 0;  }
 }
-@keyframes cartDisappear {
-  0% { opacity: 1;}
-  50% { opacity: 0.5;}
-  100% { opacity: 0;}
-}
 @keyframes cartAppear {
-  0% { opacity: 0;}
-  50% { opacity: 0.5;}
-  100% { opacity: 1;}
-}
-@media screen and (max-width: 1100px){
-  .toastr-block{
-    left:41%
-  }
-}
+  0% { opacity: 0; transform:translate(50%, -50%) scale(0, 0)}
+  50% { opacity: 0.5; transform:translate(25%, -25%) scale(0.5, 0.5)}
+  100% { opacity: 1; transform:translate(0, 0) scale(1, 1)}
+} 
   @media screen and (max-width: 978px){
     .general-question{
       display:none
-    }
-    .loginPopup {
-      left:30%;
     }
     #home-description{
     font-size:36px;
     }
   }
   @media screen and (max-width: 882px){
-  /* .product-div {
-    left:0;
-    width:100%
-  }     */
     #home-description{
     font-size:32px;
-    }
-    .toastr-block{
-      left:39%
-    }
-    .loginPopup {
-      left:28%;
     }
   }
   @media screen and (max-width: 786px){
     #home-description{
     font-size:28px;
     }
-    .toastr-block{
-      left:37%
-    }
   }
   @media screen and (max-width: 690px){
     #home-description{
     font-size:20px;
-    }
-    .toastr-block{
-      left:35%
-    }
-    .loginPopup {
-      left:24%;
-    }
-  }
-  @media screen and (max-width: 600px){
-    .loginPopup {
-      left:20%;
-    }
-    .toastr-block{
-      left:33%
-    }
-  }
-  @media screen and (max-width: 550px){
-    .loginPopup {
-      left:17%;
-    }
-  }
-  @media screen and (max-width: 500px){
-    .form-div {
-      left:16%;
-    }
-    .toastr-block{
-      left:30%
-    }
-    .loginPopup {
-      left:14%;
     }
   }
   @media screen and (max-width: 480px){

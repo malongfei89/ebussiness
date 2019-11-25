@@ -10,11 +10,28 @@ export const Globals = {
     toastr: [],
     cart: [],
     persist: function () {
-        if(this.user.length !== 0 && !sessionStorage.getItem('user')) sessionStorage.setItem('user', JSON.stringify(this.user))
-        if(this.cart.length !== 0 && !sessionStorage.getItem('cart')) sessionStorage.setItem('cart', JSON.stringify(this.cart))
-    },
-    grabFromL: function () {
-        if(sessionStorage.getItem('user')) this.user = JSON.parse(sessionStorage.getItem('user'))
-        if(sessionStorage.getItem('cart')) this.cart = JSON.parse(sessionStorage.getItem('cart'))
+        if(this.user.length) sessionStorage.setItem('user', JSON.stringify(this.user))
+        if(this.cart.length) {
+            if(this.user.length) localStorage.setItem(`cart${this.user[0].id}`, JSON.stringify(this.cart))
+            else  localStorage.setItem(`cart`, JSON.stringify(this.cart))
+        }
     }
+    // ,
+    // grabFromL: function () {
+    //     if(sessionStorage.getItem('user')) {
+    //         this.user = JSON.parse(sessionStorage.getItem('user'))
+    //         sessionStorage.removeItem('user')
+    //     }
+    //     if(this.user.length){
+    //         if(localStorage.getItem(`cart${this.user[0].id}`)) {
+    //             this.cart = JSON.parse(localStorage.getItem(`cart${this.user[0].id}`))
+    //             localStorage.removeItem(`cart${this.user[0].id}`)
+    //         }
+    //     } else{
+    //         if(localStorage.getItem(`cart`)) {
+    //             this.cart = JSON.parse(localStorage.getItem(`cart`))
+    //             localStorage.removeItem(`cart`)
+    //         }
+    //     }
+    // }
 }
