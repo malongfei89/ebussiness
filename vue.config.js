@@ -1,3 +1,3 @@
 module.exports = {
-    publicPath: '/e/b-f19-08/'
+    publicPath: '/flag-shipping/'
 }

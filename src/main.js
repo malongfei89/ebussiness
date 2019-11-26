@@ -6,6 +6,7 @@ import router from './router'
 import Header from '@/components/Header.vue'
 import Footer from '@/components/Footer.vue'
 import Popup from '@/components/Popup.vue'
+import Cart from '@/components/Cart.vue'
 import B2BDescription from '@/components/B2BDescription.vue'
 import '@/assets/main.css'
 import { Globals } from '@/services/Api'
@@ -15,16 +16,14 @@ Vue.component('Header', Header)
 Vue.component('Footer', Footer)
 Vue.component('B2BDescription', B2BDescription)
 Vue.component('Popup', Popup)
+Vue.component('Cart', Cart)
 /* eslint-disable no-new */
 new Vue({
   created() {
     window.addEventListener('beforeunload', this.writeToL)
-    //window.addEventListener('load', this.readFromL)
+    Globals.grabFromL()
   },
   methods: { 
-    // readFromL: () => {
-    //   Globals.grabFromL()
-    // },
     writeToL: () => {
       Globals.persist()
     }

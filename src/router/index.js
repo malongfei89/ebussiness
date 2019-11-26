@@ -8,7 +8,7 @@ import CheckOut from '@/views/CheckOut.vue'
 Vue.use(Router)
 
 const router = new Router({
-  base: '/e/b-f19-08/',
+  base: '/flag-shipping/',
   mode: 'hash',
   routes: [
     {

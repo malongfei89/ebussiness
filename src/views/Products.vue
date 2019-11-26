@@ -1,28 +1,19 @@
 <template>
-    <div @click="toggleCart2">
-        <Header @toggleCart="toggleCart" @showNote="showNote = !showNote">
+    <div @click="toggleCart">
+        <Header @toggleCart="showCart = !showCart" @showNote="showNote = !showNote">
         <template #customized1>
             <button style="font-weight:bold;width:100%;padding:46px 0;min-width:94px" @click="loginOrOut">{{btnD}}</button>
         </template>
         </Header>
         <div v-if="!showNote">
-        <transition name="cart">
-        <ul v-if="showCart" @click.stop class="cart-ul">
-            <div v-if="cart.length">
-                <li class="cart-li" v-for="(itemInCart, indexForItemInCart) in cart" :key="indexForItemInCart">
-                {{itemInCart.name}}<span style="float:right;padding-left:4px;display:flex;">&times;<input @focusout="updateCart(itemInCart, indexForItemInCart)" style="width:25px;margin-left:3px;padding:2px" type="number" v-model.number="itemInCart.quantity"></span><br>
-                <span style="clear:both;float:right">Price: {{(itemInCart.quantity * itemInCart.unit_price).toFixed(2)}}</span>
-                </li>
-            </div>
-            <div style="margin:50px;padding:20px 5px;font-size:24px;text-align:center" v-else>
-                Nothing has been added to your cart yet!
-            </div>
-            <div style="display:flex;justify-content:space-around;margin:20px 0">
-                <button @click="toggleCart2" class="cart-btn">Continue<br>shopping</button>
-                <button v-if="cart.length" @click="$router.push('/checkout')" class="cart-btn">Check<br> Out</button>
-            </div>
-        </ul>
-        </transition>
+        <Cart
+        :cart = "cart"
+        :showCart = "showCart"
+        @emptyCart = "emptyCart"
+        @updateCart = "updateCart"
+        @toProducts = "showCart = false"
+        @toCheckOut = "$router.push('/checkout')"
+        ></Cart>
         <div style="display:flex;width:100%;justify-content:space-evenly;padding:20px 0">
         <div class="sidebar">
             <p style="font-size:24px">
@@ -35,17 +26,17 @@
                 <li><button @click="sortByPriceR">sort by price<br>(high to low)</button></li>   
                 <li><button @click="sortBySpeed">sort by speed<br>(slow to fast)</button></li>   
                 <li><button @click="sortBySpeedR">sort by speed<br>(fast to low)</button></li>   
-                <li>Price from <input v-model="lowPrice" style="width:30px"> To <input v-model="highPrice" style="width:30px"> <button @click="itemInRange(lowPrice,highPrice)"> go</button></li>   
+                <li>Price from <input v-model.number="lowPrice" style="width:30px"> To <input v-model.number="highPrice" style="width:30px"> <button @click="itemInRange(lowPrice,highPrice)"> go</button></li>   
                 <li><button style="left:30%;position:relative" @click="resetProducts">reset</button></li>   
             </ul>
         </div>
         <ul class="product-div">
-            <li v-for="(item, index) in products" :key="item.id"  class="item-div">
+            <li v-for="item in products" :key="item.id"  class="item-div">
                 <div style="border:2px solid grey;">
                 <div style="padding-top:16px">{{item.name}}</div>
                 <div style="padding-top:16px">$ {{item.unit_price}}</div>
-                <div style="padding-top:16px">{{itemStockInfo(item, index)}}</div>
-                <button @click.stop="addToCart(item)" :style="styleforBtn(item)">Add</button>
+                <div style="padding-top:16px">{{itemStockInfo(item)}}</div>
+                <button v-if="item.quantity" @click.stop="addToCart(item)" style="padding:20px;margin:15px;">Add</button>
                 </div>
             </li>
         </ul>
@@ -69,6 +60,7 @@
     </div>
 </template>
 <script>
+//improve resetProducts so that it doesn't make request to the backend
 import { throttlingComponents } from '@/services/ThrottlingComponents'
 import { Globals } from '@/services/Api'
 import Authentication from '@/services/Authentication'
@@ -76,10 +68,9 @@ import GetProducts from '@/services/GetProducts'
 export default {
     data: () => {
         return {
-            user: [],
+            user: Globals.user,
             products: null,
-            numOfProducts: 0,
-            cart: [],
+            cart: Globals.cart,
             showCart: false,
             lowPrice: null,
             highPrice: null,
@@ -93,39 +84,18 @@ export default {
         }
     },
     async created () {
-      if(Globals.cart.length || Globals.user.length) {
-          this.user = Globals.user
-          this.cart = Globals.cart
-      } else{
-          if(sessionStorage.getItem('user')) {
-              this.user = JSON.parse(sessionStorage.getItem('user'))
-          }
-          if(this.user.length){
-              if(localStorage.getItem(`cart${this.user[0].id}`)) {
-                  this.cart = JSON.parse(localStorage.getItem(`cart${this.user[0].id}`))
-              }
-          } else{
-              if(localStorage.getItem(`cart`)) {
-                  this.cart = JSON.parse(localStorage.getItem(`cart`))
-                  localStorage.removeItem('cart')
-              }
-          }
-          Globals.user = this.user
-          Globals.cart = this.cart
-      }
-      this.products = (await GetProducts.getProducts()).data
+      this.products = Globals.products =  (await GetProducts.getProducts()).data
       this.numOfProducts = this.products.length
       this.addToCart = throttlingComponents(500, this.addToCart)
     },
     methods: {
         loginOrOut () {
-            if(this.btnD === 'Log out') {
-                localStorage.setItem(`cart${this.user[0].id}`, JSON.stringify(this.cart))
-                this.cart= Globals.cart = []
-                this.user.pop()
-                if(sessionStorage.getItem('user')) sessionStorage.removeItem('user')
-            }
-            else this.showLoginPopup = true
+          if(this.btnD === 'Log out') {
+            localStorage.setItem(`cart${this.user[0].id}`, JSON.stringify(this.cart))
+            this.cart=[]
+            this.user.pop()
+            if(sessionStorage.getItem('user')) sessionStorage.removeItem('user')
+          } else this.showLoginPopup = true
         },
         async login (credential) {
             try {
@@ -141,7 +111,6 @@ export default {
                 })
                 if(localStorage.getItem(`cart${this.user[0].id}`)){
                    const result = JSON.parse(localStorage.getItem(`cart${this.user[0].id}`))
-                   localStorage.removeItem(`cart${this.user[0].id}`)
                     for(let i = 0;i<this.cart.length;i++) {
                         for(let j=0;j<result.length;j++) {
                         if(this.cart[i].id === result[j].id){
@@ -159,9 +128,6 @@ export default {
         },
         itemStockInfo (item) {
             return item.quantity>0?'In Stock':'Out of Stock'
-        },
-        styleforBtn (item){
-            return item.quantity > 0?'padding:20px;margin:15px;':'padding:20px;margin:15px;visibility:hidden;'
         },
         addToCart (item) {
             let alreadyInCart = false
@@ -186,14 +152,11 @@ export default {
             })
         },
         toggleCart () {
-            this.showCart = !this.showCart
-        },
-        toggleCart2 () {
             if(this.showCart) this.showCart=false
         },
-        updateCart (itemInCart, indexForItemInCart) {
-            if(itemInCart.quantity < 0 ) itemInCart.quantity = 0
-            if(itemInCart.quantity === 0 || itemInCart.quantity === "") this.cart.splice(indexForItemInCart, 1)
+        updateCart (item, index) {
+          if(item.quantity < 0 ) item.quantity = 0
+          if(!item.quantity) this.cart.splice(index, 1)
         },
         sortByName () {
             this.products.sort(function(a, b) {
@@ -228,18 +191,19 @@ export default {
             this.sortBySpeed()
             this.products.reverse()
         },
-        itemInRange (low, high) {
+        async itemInRange (low, high) {
             this.lowPrice = null
             this.highPrice = null
-            this.resetProducts()
+            this.products = Globals.products
             this.products = this.products.filter(item => {
                 return item.unit_price > low && item.unit_price < high
             })
         },
-        async resetProducts () {
-            if(this.products.length < this.numOfProducts) 
-                this.products = (await GetProducts.getProducts()).data
-            else this.sortByName()
+        resetProducts () {
+          this.products = Globals.products
+        },
+        emptyCart() {
+          this.cart = Globals.cart = []
         }
     }
 }

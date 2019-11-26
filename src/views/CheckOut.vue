@@ -1,26 +1,18 @@
 <template>
-  <div @click="toggleCart2">
-    <Header @toggleCart="toggleCart" @showNote="showNote = !showNote">
+  <div @click="toggleCart">
+    <Header @toggleCart="showCart = !showCart" @showNote="showNote = !showNote">
       <template #customized1>
             <button style="font-weight:bold;width:100%;padding:46px 0;min-width:94px" @click="logOut">{{btnD}}</button>
       </template>
     </Header>
-    <transition name="cart">
-    <ul v-if="showCart" @click.stop class="cart-ul">
-      <div v-if="cart.length">
-        <li class="cart-li" v-for="(item, index) in cart" :key="index">
-          {{item.name}}<span style="float:right;padding-left:4px;display:flex;">&times;<input @focusout="updateCart(item, index)" style="width:25px;margin-left:3px;padding:2px" type="number" min="0" v-model.number="item.quantity"></span><br>
-          <span style="clear:both;float:right">Price: {{item.quantity * item.unit_price}}</span>
-        </li>
-      </div>
-      <div style="margin:50px;padding:20px 5px;font-size:24px;text-align:center" v-else>
-        Nothing has been added to your cart yet!
-      </div>
-      <div style="display:flex;justify-content:center;margin:20px">
-        <button @click="$router.push('/products')" class="cart-btn">Continue<br>shopping</button>
-      </div>
-    </ul>
-    </transition>
+    <Cart
+    :cart = "cart"
+    :showCart = "showCart"
+    @emptyCart = "emptyCart"
+    @updateCart = "updateCart"
+    @toProducts = "$router.push('/products')"
+    @toCheckOut = "showCart = false"
+    ></Cart>
     <div v-if="!orderSuccessful">
       <Popup
         btnValue = "Add" 
@@ -116,26 +108,6 @@ export default {
     }
   },
   async created () {
-    if(Globals.cart.length || Globals.user.length) {
-        this.user = Globals.user
-        this.cart = Globals.cart
-    } else{
-      if(sessionStorage.getItem('user')) {
-          this.user = JSON.parse(sessionStorage.getItem('user'))
-      }
-      if(this.user.length){
-          if(localStorage.getItem(`cart${this.user[0].id}`)) {
-              this.cart = JSON.parse(localStorage.getItem(`cart${this.user[0].id}`))
-          }
-      } else{
-          if(localStorage.getItem(`cart`)) {
-              this.cart = JSON.parse(localStorage.getItem(`cart`))
-              localStorage.removeItem('cart')
-          }
-      }
-      Globals.user = this.user
-      Globals.cart = this.cart
-    }
     this.bankInfo = (await Authentication.getBankInfo({
       id: this.user[0].id
     })).data
@@ -156,9 +128,9 @@ export default {
     }
   },
   methods: {
-    updateCart (itemInCart, indexForItemInCart) {
-      if(itemInCart.quantity < 0 ) itemInCart.quantity = 0
-      if(itemInCart.quantity === 0 || itemInCart.quantity === "") this.cart.splice(indexForItemInCart, 1)
+    updateCart (item, index) {
+      if(item.quantity < 0 ) item.quantity = 0
+      if(!item.quantity) this.cart.splice(index, 1)
     },
     async checkout () {
       if(this.selectedBankInfo.bankName === null | this.selectedBankInfo.bankAccount === null | this.shipToName === null | this.shipToAddress === null){
@@ -168,7 +140,7 @@ export default {
       if(this.totalCost>0){
         if(confirm(`You will be changred for ${(this.totalCost + this.calTax).toFixed(2)} dollars.`)){
           try {
-            if(this.bankInfo.length === 0){
+            if(!this.bankInfo.length){
               this.confirmationID = (await Authentication.checkout({
                 id: this.user[0].id,
                 shipToName: this.shipToName,
@@ -207,10 +179,10 @@ export default {
       }
     },
     toggleCart () {
-      this.showCart = !this.showCart
-    },
-    toggleCart2 () {
       if(this.showCart) this.showCart=false
+    },
+    emptyCart () {
+      this.cart = Globals.cart = []
     },
     async addNewBankInfo (credential) {
       try {
@@ -232,7 +204,7 @@ export default {
     logOut () {
       if(confirm('Your order will be lost. Are you sure?')){
         localStorage.setItem(`cart${this.user[0].id}`, JSON.stringify(this.cart))
-        this.cart= Globals.cart = []
+        this.cart= []
         this.user.pop()
         if(sessionStorage.getItem('user')) sessionStorage.removeItem('user')
         this.$router.push('/')
