@@ -2,7 +2,7 @@ import axios from 'axios'
 
 export function api() {
     return axios.create({
-        baseURL: 'http://ec2-3-134-94-92.us-east-2.compute.amazonaws.com:3001'
+        baseURL: 'http://cs.newpaltz.edu:11080'
     })
 }
 export const Globals = {

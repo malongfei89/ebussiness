@@ -1,11 +1,11 @@
 <template>
   <div id="app">
+    <router-view/>
     <div style="position:absolute;z-index:2;left:20%;width:80%;transform:translate(-12.5%,-14%);text-align:center;top:14%">
        <div :id="`toast-${index}`" v-for="(toast, index) in newToast" :key="index" @click="resetToastr(index)" @animationend="resetToastr(index)" :style="{backgroundColor:toast.type==='error'?error:success}" class="toastr-block">
         {{toast.message}}
       </div>
     </div>
-    <router-view/>
   </div>
 </template>
 

@@ -2,7 +2,7 @@
   <div @click="toggleCart">
     <Header @toggleCart="showCart = !showCart">
       <template #customized1>
-      <button style="font-weight:bold;padding:46px 0;width:100%;min-width:94px" @click="showLoginPopup=true">{{btnD}}</button>
+      <button class="menu-login" @click="showLoginPopup=true">{{btnD}}</button>
     </template>
     </Header>
     <Cart
@@ -10,6 +10,8 @@
     :showCart = "showCart"
     @emptyCart = "emptyCart"
     @updateCart = "updateCart"
+    @toProducts = "$router.push('/products')"
+    @toCheckOut = "$router.push('/checkout')"
     ></Cart>
     <Popup
       btnValue = "Login" 

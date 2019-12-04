@@ -2,7 +2,7 @@
 <div @click="toggleCart">
   <Header @toggleCart='showCart = !showCart' @showNote="showNote = !showNote">
     <template #customized1>
-      <button style="font-weight:bold;padding:46px 0;width:100%;min-width:94px" @click="loginOrOut">{{btnD}}</button>
+      <button class="menu-login" @click="loginOrOut">{{btnD}}</button>
     </template>
   </Header>
   <main v-if="!showNote">
@@ -15,9 +15,10 @@
     @toCheckOut = "$router.push('/checkout')"
     ></Cart>
     <div id="home-main">
-    <div style="margin:0;padding:0">
-      <img style="width:66%;float:left" src="@/assets/home-page-pic.jpg" alt="fast shipping">
-    </div>
+        <div style="width:66%;max-width:1600px;clear:both;float:left;overflow:hidden;display:flex">
+          <img id="pic1" src= "@/assets/home-page-pic-1.jpg" alt="fast shipping">
+          <img id="pic2" src= "@/assets/home-page-pic-2.jpg" alt="fast shipping">
+        </div>
     <Popup
     btnValue = "Login" 
     type1 = "text"
@@ -45,6 +46,7 @@
 <script>
 import { Globals } from '@/services/Api'
 import Authentication from '@/services/Authentication'
+import { setInterval, clearInterval } from 'timers'
 export default {
   data: () => {
     return {
@@ -52,9 +54,41 @@ export default {
       showCart: false,
       user: Globals.user,
       showNote: false,
-      showLoginPopup: false
+      showLoginPopup: false,
+      picNum: 1,
+      slideInterval: null
     }
-  }, 
+  },
+  created () {
+    this.slideInterval = setInterval(function() {
+      let pic1 = document.getElementById('pic1')
+      let pic2 = document.getElementById('pic2')
+      if(++this.picNum===1) {
+        pic1.classList.add('pic1slide')
+        pic1.style.display = 'inline'
+        pic2.classList.add('pic2slideout')
+        setTimeout(function () {
+          pic2.style.display = 'none'
+          pic2.classList.remove('pic2slideout')
+          pic1.classList.remove('pic1slide')
+        }, 1450)
+      }
+      else{
+        pic2.classList.add('pic2slide')
+        pic2.style.display = 'inline'
+        pic1.classList.add('pic1slideout')
+        setTimeout(function () {
+          pic1.style.display = 'none'
+          pic1.classList.remove('pic1slideout')
+          pic2.classList.remove('pic2slide')
+        }, 1450)
+        this.picNum = 0
+      }
+    }, 4000)
+  },
+  beforeDestroy() {
+    clearInterval(this.slideInterval)
+  },
   computed: {
     btnD: function () {
       return this.user.length?'Log out':'Register/Login'

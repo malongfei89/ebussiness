@@ -8,7 +8,7 @@ import CheckOut from '@/views/CheckOut.vue'
 Vue.use(Router)
 
 const router = new Router({
-  base: '/flag-shipping/',
+  base: '/e/b-f19-08',
   mode: 'hash',
   routes: [
     {
@@ -34,9 +34,11 @@ const router = new Router({
   ]
 })
 router.beforeEach((to, from, next) => {
+  while(Globals.toastr.length > 0) {
+    Globals.toastr.pop()
+  }
   if(to.name === 'CheckOut') {
-    if(!Globals.user.length && !sessionStorage.getItem('user')) {
-      next('/')
+    if(!Globals.user.length) {
       Globals.toastr.push({
         type: 'error',
         message: 'Please log in first!'
@@ -44,10 +46,6 @@ router.beforeEach((to, from, next) => {
       return
     }
     next()
-  }
-  while(Globals.toastr.length > 0) {
-    Globals.toastr.pop()
-  }
-  next()
+  } else next()
 })
 export default router

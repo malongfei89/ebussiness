@@ -2,7 +2,7 @@
     <div @click="toggleCart">
         <Header @toggleCart="showCart = !showCart" @showNote="showNote = !showNote">
         <template #customized1>
-            <button style="font-weight:bold;width:100%;padding:46px 0;min-width:94px" @click="loginOrOut">{{btnD}}</button>
+            <button class="menu-login" @click="loginOrOut">{{btnD}}</button>
         </template>
         </Header>
         <div v-if="!showNote">
@@ -56,7 +56,7 @@
         </Popup>
         </div>
         <B2BDescription v-else @closeNote="showNote=false"></B2BDescription>
-        <Footer></Footer>>
+        <Footer></Footer>
     </div>
 </template>
 <script>
@@ -146,6 +146,7 @@ export default {
                 id: item.id
                 })
             }
+            this.showCart = true
             Globals.toastr.push({
                 type: 'success',
                 message: `It's been added to your cart! Yeaaaaaaah`

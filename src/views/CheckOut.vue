@@ -2,7 +2,7 @@
   <div @click="toggleCart">
     <Header @toggleCart="showCart = !showCart" @showNote="showNote = !showNote">
       <template #customized1>
-            <button style="font-weight:bold;width:100%;padding:46px 0;min-width:94px" @click="logOut">{{btnD}}</button>
+            <button class="menu-login" @click="logOut">{{btnD}}</button>
       </template>
     </Header>
     <Cart
